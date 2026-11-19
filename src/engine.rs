@@ -105,7 +105,7 @@ impl Engine {
                         let start = Instant::now();
 
                         // scan this file with the loaded YARA rules
-                        match self.rules.scan_file(&path, self.config.timeout) {
+                        match std::fs::read(&path).map_err(|e| format!("{:?}", e)).and_then(|buf| self.rules.scan_mem(&buf, self.config.timeout).map_err(|e| format!("{:?}", e))) {
                             Ok(matches) => {
                                 if !matches.is_empty() {
                                     detected = true;
@@ -138,3 +138,4 @@ impl Engine {
         }
     }
 }
+
